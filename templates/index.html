@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+
+<head>
+    <title>Angular, D3, CoffeeScript</title>
+    <script src="lib/angular.js" defer></script>
+    <script src="lib/d3.js" defer></script>
+    <script src="bin/main.js" defer></script>
+    <script src="bin/chart.js" defer></script>
+</head>
+
+<style type="text/css">
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+chart {
+    display: block;
+    margin: 40px auto;
+    width: 1200px; 
+    height: 800px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+svg {
+  display: block;
+  margin: 0 auto;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  font: 10px sans-serif;
+  shape-rendering: auto;
+}
+
+.left_axis {
+    font-weight: bold;
+}
+
+</style>
+
+<body>
+    <!--Raw to avoid jinja processing angular templates-->
+    {% raw %}
+    <div ng-controller="ChartController">
+        <chart id="svg-container"></chart>
+    </div>
+    {% endraw %}
+</body>
+
+</html>
