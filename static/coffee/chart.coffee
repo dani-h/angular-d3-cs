@@ -33,7 +33,7 @@ class Chart
     xmax = d3.max(layered_data[layered_data.length - 1], (entry) -> entry.y0 + entry.y)
     # We need to round xmax, otherwise we get uneven ticks and top and bottom axis are not equal. Therefore we need the
     # value to be rounded to 100 since percentages are divisible by 100
-    rounded_xmax = Math.round(xmax / 100) * 100
+    rounded_xmax = Math.ceil(xmax / 100) * 100
     x = d3.scale.linear().range([0, @width])
       .domain([0, rounded_xmax])
 
@@ -164,7 +164,7 @@ generate_data = () ->
   for i in [0...30]
     data.push({
       key: "Access group #{i + 1}"
-      "Low activity": Math.random() * 10 + 10
+      "Low activity": Math.random() * 10 + 20
       "Med activity": Math.random() * 50 + 50
       "High activity": Math.random() * 50 + 20
     })

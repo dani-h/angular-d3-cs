@@ -29,7 +29,7 @@
       xmax = d3.max(layered_data[layered_data.length - 1], function(entry) {
         return entry.y0 + entry.y;
       });
-      rounded_xmax = Math.round(xmax / 100) * 100;
+      rounded_xmax = Math.ceil(xmax / 100) * 100;
       x = d3.scale.linear().range([0, this.width]).domain([0, rounded_xmax]);
       y = d3.scale.ordinal().rangeBands([0, this.height], 0.5).domain(data.map(function(entry, idx) {
         return idx;
@@ -118,7 +118,7 @@
     for (i = j = 0; j < 30; i = ++j) {
       data.push({
         key: "Access group " + (i + 1),
-        "Low activity": Math.random() * 10 + 10,
+        "Low activity": Math.random() * 10 + 20,
         "Med activity": Math.random() * 50 + 50,
         "High activity": Math.random() * 50 + 20
       });
