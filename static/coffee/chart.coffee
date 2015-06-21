@@ -1,7 +1,7 @@
 class Chart
   constructor: ->
     @vertical_padding = 100
-    @horizontal_padding =  40
+    @horizontal_padding =  60
     @width = 1200 - @vertical_padding * 2
     @height = 2000 - @horizontal_padding * 2
 
@@ -86,7 +86,7 @@ class Chart
       .data(data)
       .enter().append('g')
       .attr('class', 'legend')
-      .attr('transform', (d, idx) => "translate(#{idx * rect_side * 8}, #{-@horizontal_padding})")
+      .attr('transform', (d, idx) => "translate(#{idx * rect_side * 5}, #{-@horizontal_padding + 10})")
 
     legends.append('rect')
       .attr('x', 0)
@@ -97,7 +97,7 @@ class Chart
 
     legends.append('text')
       .text((d) -> d[0].name)
-      .attr('x', rect_side + 1)
+      .attr('x', rect_side + 2)
       .attr('y', rect_side - 5)
 
 

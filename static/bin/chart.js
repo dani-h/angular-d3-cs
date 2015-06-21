@@ -7,7 +7,7 @@
     function Chart() {
       this.draw_left_axis = bind(this.draw_left_axis, this);
       this.vertical_padding = 100;
-      this.horizontal_padding = 40;
+      this.horizontal_padding = 60;
       this.width = 1200 - this.vertical_padding * 2;
       this.height = 2000 - this.horizontal_padding * 2;
     }
@@ -68,7 +68,7 @@
       rect_side = 20;
       legends = svg.selectAll('.legend').data(data).enter().append('g').attr('class', 'legend').attr('transform', (function(_this) {
         return function(d, idx) {
-          return "translate(" + (idx * rect_side * 8) + ", " + (-_this.horizontal_padding) + ")";
+          return "translate(" + (idx * rect_side * 5) + ", " + (-_this.horizontal_padding + 10) + ")";
         };
       })(this));
       legends.append('rect').attr('x', 0).attr('y', 0).attr('width', rect_side).attr('height', rect_side).style('fill', function(d, i) {
@@ -76,7 +76,7 @@
       });
       return legends.append('text').text(function(d) {
         return d[0].name;
-      }).attr('x', rect_side + 1).attr('y', rect_side - 5);
+      }).attr('x', rect_side + 2).attr('y', rect_side - 5);
     };
 
     Chart.prototype.draw_bars = function(svg, data, x, y, color) {
