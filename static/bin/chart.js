@@ -13,13 +13,14 @@
     }
 
     Chart.prototype.render = function(el, data) {
-      var color, layered_data, svg, x, xmax, y;
+      var colorscale, layered_data, svg, x, xmax, y;
       svg = d3.select('#svg-container').append('svg').style('width', this.width + this.vertical_padding * 2).style('height', this.height + this.horizontal_padding * 2).append('g').attr('transform', "translate( " + this.vertical_padding + ", " + this.horizontal_padding + " )");
-      layered_data = ["a", "b", "c"].map(function(keyword) {
+      layered_data = ["Low activity", "Med activity", "High activity"].map(function(keyword) {
         return data.map(function(entry) {
           return {
             x: entry.key,
-            y: entry[keyword]
+            y: entry[keyword],
+            name: keyword
           };
         });
       });
@@ -31,10 +32,11 @@
       y = d3.scale.ordinal().rangeBands([0, this.height], 0.5).domain(data.map(function(entry, idx) {
         return idx;
       }));
-      color = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"]);
+      colorscale = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"]);
       this.draw_top_axis(svg, x);
       this.draw_left_axis(svg, y, layered_data[0]);
-      return this.draw_bars(svg, layered_data, x, y, color);
+      this.draw_legend(svg, layered_data, colorscale);
+      return this.draw_bars(svg, layered_data, x, y, colorscale);
     };
 
     Chart.prototype.draw_top_axis = function(svg, x) {
@@ -61,8 +63,20 @@
       });
     };
 
-    Chart.prototype.draw_legend = function() {
-      return "ok";
+    Chart.prototype.draw_legend = function(svg, data, colorscale) {
+      var legends, rect_side;
+      rect_side = 20;
+      legends = svg.selectAll('.legend').data(data).enter().append('g').attr('class', 'legend').attr('transform', (function(_this) {
+        return function(d, idx) {
+          return "translate(" + (idx * rect_side * 8) + ", " + (-_this.horizontal_padding) + ")";
+        };
+      })(this));
+      legends.append('rect').attr('x', 0).attr('y', 0).attr('width', rect_side).attr('height', rect_side).style('fill', function(d, i) {
+        return colorscale(i);
+      });
+      return legends.append('text').text(function(d) {
+        return d[0].name;
+      }).attr('x', rect_side + 1).attr('y', rect_side - 5);
     };
 
     Chart.prototype.draw_bars = function(svg, data, x, y, color) {
@@ -91,9 +105,9 @@
     for (i = j = 0; j < 30; i = ++j) {
       data.push({
         key: "Access group " + (i + 1),
-        a: Math.random() * 10 + 10,
-        b: Math.random() * 50 + 50,
-        c: Math.random() * 50 + 20
+        "Low activity": Math.random() * 10 + 10,
+        "Med activity": Math.random() * 50 + 50,
+        "High activity": Math.random() * 50 + 20
       });
     }
     return data;
@@ -104,5 +118,3 @@
   window.generate_data = generate_data;
 
 }).call(this);
-
-//# sourceMappingURL=chart.js.map

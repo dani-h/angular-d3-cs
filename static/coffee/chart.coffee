@@ -12,9 +12,9 @@ class Chart
       .append('g')
         .attr('transform', "translate( #{@vertical_padding}, #{@horizontal_padding} )")
 
-    layered_data = ["a", "b", "c"].map((keyword) ->
+    layered_data = ["Low activity", "Med activity", "High activity"].map((keyword) ->
       data.map((entry) ->
-        {x: entry.key, y: entry[keyword]}))
+        {x: entry.key, y: entry[keyword], name: keyword}))
 
     # Note: For stack layered charts:
     # y  = used for thickness
@@ -30,11 +30,12 @@ class Chart
     y = d3.scale.ordinal().rangeBands([0, @height], 0.5)
       .domain(data.map((entry, idx) -> idx))
 
-    color = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"])
+    colorscale = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"])
 
     @draw_top_axis(svg, x)
     @draw_left_axis(svg, y, layered_data[0])
-    @draw_bars(svg, layered_data, x, y, color)
+    @draw_legend(svg, layered_data, colorscale)
+    @draw_bars(svg, layered_data, x, y, colorscale)
 
 
 
@@ -78,8 +79,26 @@ class Chart
       .text((d) -> d.x)
 
 
-  draw_legend: ->
-    "ok"
+  draw_legend: (svg, data, colorscale) ->
+    rect_side = 20
+
+    legends = svg.selectAll('.legend')
+      .data(data)
+      .enter().append('g')
+      .attr('class', 'legend')
+      .attr('transform', (d, idx) => "translate(#{idx * rect_side * 8}, #{-@horizontal_padding})")
+
+    legends.append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', rect_side)
+      .attr('height', rect_side)
+      .style('fill', (d, i) -> colorscale(i))
+
+    legends.append('text')
+      .text((d) -> d[0].name)
+      .attr('x', rect_side + 1)
+      .attr('y', rect_side - 5)
 
 
   draw_bars: (svg, data, x, y, color) ->
@@ -110,9 +129,9 @@ generate_data = () ->
   for i in [0...30]
     data.push({
       key: "Access group #{i + 1}"
-      a: Math.random() * 10 + 10
-      b: Math.random() * 50 + 50
-      c: Math.random() * 50 + 20
+      "Low activity": Math.random() * 10 + 10
+      "Med activity": Math.random() * 50 + 50
+      "High activity": Math.random() * 50 + 20
     })
   data
 
