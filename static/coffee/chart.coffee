@@ -6,9 +6,17 @@ class Chart
     @height = 2000 - @horizontal_padding * 2
 
   render: (el, data) ->
-    svg = d3.select('#svg-container').append('svg')
+    # Main function for rendering the d3 stacked bar chart.
+    # Note that the chart consists of two independent `svg` components. One that contains most of the chart (bars, top
+    # axis, left axis) and another one which contains the bottom axis. The main svg is wrapped in a div and is made
+    # scrollable. The bottom axis is positioned below that div and is visible at all times.
+    main_div = d3.select(el)
+      .append('div')
+      .attr('class', 'main_div')
+
+    svg = main_div.append('svg')
       .style('width', @width + @vertical_padding * 2)
-      .style('height', @height+ @horizontal_padding * 2)
+      .style('height', @height + @horizontal_padding * 2)
       .append('g')
         .attr('transform', "translate( #{@vertical_padding}, #{@horizontal_padding} )")
 
@@ -17,29 +25,33 @@ class Chart
         {x: entry.key, y: entry[keyword], name: keyword}))
 
     # Note: For stack layered charts:
-    # y  = used for thickness
-    # y0 = used for baseline
-    # Note: d3.layout.stack seems to both return and mutate data in place
+    # y used for thickness, y0 used for baseline
+    # d3.layout.stack seems to both return and mutate data in place
     d3.layout.stack()(layered_data)
 
     # Last entry has the highest baseline
     xmax = d3.max(layered_data[layered_data.length - 1], (entry) -> entry.y0 + entry.y)
+    # We need to round xmax, otherwise we get uneven ticks and top and bottom axis are not equal. Therefore we need the
+    # value to be rounded to 100 since percentages are divisible by 100
+    rounded_xmax = Math.round(xmax / 100) * 100
     x = d3.scale.linear().range([0, @width])
-      .domain([0, xmax])
+      .domain([0, rounded_xmax])
 
     y = d3.scale.ordinal().rangeBands([0, @height], 0.5)
       .domain(data.map((entry, idx) -> idx))
 
     colorscale = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"])
 
+    # Bottom axis is detached from the svg chart as the svg chart is scrollable while the
+    # bottom axis is always visible
+    @draw_bottom_axis(el, x.copy().domain([0, 100]))
     @draw_top_axis(svg, x)
     @draw_left_axis(svg, y, layered_data[0])
     @draw_legend(svg, layered_data, colorscale)
     @draw_bars(svg, layered_data, x, y, colorscale)
 
 
-
-  draw_top_axis: (svg, x) ->
+  draw_top_axis: (svg, x, ticks) ->
     # Top axis
     # --------------------------------------
     # Draw the axis first as I'm not sure if there is an alternative to `render-order`
@@ -50,6 +62,7 @@ class Chart
       .attr('class', 'top_axis')
       .attr('transform', (d) -> "translate(#{x(d)}, 0)")
 
+    # Horizontal lines that go through the chart
     top_axis.append('line')
       .attr('y2', @height)
       .style('stroke', 'gray')
@@ -59,11 +72,33 @@ class Chart
       .attr("dy", "-.5em")
       .text((d) -> d)
 
-    # Text that describes the top axis
+    # Standalone top right text `# of members`
     svg.append('text')
       .attr('transform', "translate(#{@width}, -20)")
       .text('# of members')
       .style('font-weight', 'bold')
+
+
+  draw_bottom_axis: (el, x) ->
+    # Draws the bottom axis
+    # @Todo: Fix comment below when I get some sleep.
+    # There are a couple of gotchas here. First, the percentage axis will use the 0, 100 for the domain while the top
+    # axis that displays exact numbers use the max from random data for the domain. The horizontal lines on the chart
+    # are made based on the random data from the top axis and will therefore not overlap with the bottom axis because of
+    # the different domain. This is a question of how you want to visualize the data, but I'll leave it for now since it
+    # looks ok.
+    bottom_axis_area = d3.select(el).append('svg')
+      .style('width', @width + @vertical_padding * 2)
+      .style('height', 30)
+      .style('margin', '0 auto')
+      .append('g')
+        .attr('transform', "translate( #{@vertical_padding}, 0)")
+
+    bottom_axis_area.selectAll('.bottom_axis')
+      .data(x.ticks(10))
+      .enter().append('text')
+      .attr('transform', (d) -> "translate(#{x(d)}, 20)")
+      .text((d) -> d + "%")
 
 
   draw_left_axis: (svg, y, data) =>

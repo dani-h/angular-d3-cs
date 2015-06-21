@@ -10,6 +10,7 @@
 </head>
 
 <style type="text/css">
+
 *, *:before, *:after {
     box-sizing: border-box;
 }
@@ -17,29 +18,35 @@
 chart {
     display: block;
     margin: 40px auto;
-    width: 1200px; 
-    height: 800px;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 svg {
   display: block;
-  margin: 0 auto;
-  border-top: 1px solid gray;
-  border-bottom: 1px solid gray;
   font: 10px sans-serif;
   shape-rendering: auto;
+}
+
+.main_div {
+    width: 1200px;
+    height: 800px;
+    margin: 0 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .left_axis {
     font-weight: bold;
 }
 
+.bottom_axis {
+    fill: #444444;
+}
+
 .legend text {
     font-size: 12px; 
     fill: #444444;
 }
+
 
 </style>
 

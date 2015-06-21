@@ -13,8 +13,9 @@
     }
 
     Chart.prototype.render = function(el, data) {
-      var colorscale, layered_data, svg, x, xmax, y;
-      svg = d3.select('#svg-container').append('svg').style('width', this.width + this.vertical_padding * 2).style('height', this.height + this.horizontal_padding * 2).append('g').attr('transform', "translate( " + this.vertical_padding + ", " + this.horizontal_padding + " )");
+      var colorscale, layered_data, main_div, rounded_xmax, svg, x, xmax, y;
+      main_div = d3.select(el).append('div').attr('class', 'main_div');
+      svg = main_div.append('svg').style('width', this.width + this.vertical_padding * 2).style('height', this.height + this.horizontal_padding * 2).append('g').attr('transform', "translate( " + this.vertical_padding + ", " + this.horizontal_padding + " )");
       layered_data = ["Low activity", "Med activity", "High activity"].map(function(keyword) {
         return data.map(function(entry) {
           return {
@@ -28,18 +29,20 @@
       xmax = d3.max(layered_data[layered_data.length - 1], function(entry) {
         return entry.y0 + entry.y;
       });
-      x = d3.scale.linear().range([0, this.width]).domain([0, xmax]);
+      rounded_xmax = Math.round(xmax / 100) * 100;
+      x = d3.scale.linear().range([0, this.width]).domain([0, rounded_xmax]);
       y = d3.scale.ordinal().rangeBands([0, this.height], 0.5).domain(data.map(function(entry, idx) {
         return idx;
       }));
       colorscale = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"]);
+      this.draw_bottom_axis(el, x.copy().domain([0, 100]));
       this.draw_top_axis(svg, x);
       this.draw_left_axis(svg, y, layered_data[0]);
       this.draw_legend(svg, layered_data, colorscale);
       return this.draw_bars(svg, layered_data, x, y, colorscale);
     };
 
-    Chart.prototype.draw_top_axis = function(svg, x) {
+    Chart.prototype.draw_top_axis = function(svg, x, ticks) {
       var top_axis;
       top_axis = svg.selectAll('.top_axis').data(x.ticks(10)).enter().append('g').attr('class', 'top_axis').attr('transform', function(d) {
         return "translate(" + (x(d)) + ", 0)";
@@ -49,6 +52,16 @@
         return d;
       });
       return svg.append('text').attr('transform', "translate(" + this.width + ", -20)").text('# of members').style('font-weight', 'bold');
+    };
+
+    Chart.prototype.draw_bottom_axis = function(el, x) {
+      var bottom_axis_area;
+      bottom_axis_area = d3.select(el).append('svg').style('width', this.width + this.vertical_padding * 2).style('height', 30).style('margin', '0 auto').append('g').attr('transform', "translate( " + this.vertical_padding + ", 0)");
+      return bottom_axis_area.selectAll('.bottom_axis').data(x.ticks(10)).enter().append('text').attr('transform', function(d) {
+        return "translate(" + (x(d)) + ", 20)";
+      }).text(function(d) {
+        return d + "%";
+      });
     };
 
     Chart.prototype.draw_left_axis = function(svg, y, data) {
