@@ -10,6 +10,9 @@ class Chart
     # Note that the chart consists of two independent `svg` components. One that contains most of the chart (bars, top
     # axis, left axis) and another one which contains the bottom axis. The main svg is wrapped in a div and is made
     # scrollable. The bottom axis is positioned below that div and is visible at all times.
+    #
+    # We expect that the data contains a json array where each object has an `xkey` and all the other keys describe the
+    # different y layers. See `generate_data()`. Example [{xkey: 'foo', y1: 'baz', y2: 'bar'},...]
 
     d3el = d3.select(el)
     top_svg = @create_svg(d3el, @width, 30, @vertical_padding, 30)
@@ -17,9 +20,11 @@ class Chart
     main_svg = @create_svg(main_div, @width, @height, @vertical_padding, 0)
     bottom_svg = @create_svg(d3el, @width, 30, @vertical_padding, 0)
 
-    layered_data = ["Low activity", "Med activity", "High activity"].map((keyword) ->
+    # Relevant keys for the different y layers
+    relevant_y_keys = Object.keys(data[0]).filter((key) -> key != "xkey")
+    layered_data = relevant_y_keys.map((keyword) ->
       data.map((entry) ->
-        {x: entry.key, y: entry[keyword], name: keyword}))
+        {x: entry.xkey, y: entry[keyword], name: keyword}))
 
     # Note: For stack layered charts:
     # y used for thickness, y0 used for baseline
@@ -167,7 +172,7 @@ generate_data = () ->
   data = []
   for i in [0...30]
     data.push({
-      key: "Access group #{i + 1}"
+      xkey: "Access group #{i + 1}"
       "Low activity": Math.random() * 10 + 20
       "Med activity": Math.random() * 50 + 50
       "High activity": Math.random() * 50 + 20

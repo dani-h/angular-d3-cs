@@ -13,16 +13,19 @@
     }
 
     Chart.prototype.render = function(el, data) {
-      var bottom_svg, colorscale, d3el, layered_data, main_div, main_svg, rounded_xmax, top_svg, x, xmax, y;
+      var bottom_svg, colorscale, d3el, layered_data, main_div, main_svg, relevant_y_keys, rounded_xmax, top_svg, x, xmax, y;
       d3el = d3.select(el);
       top_svg = this.create_svg(d3el, this.width, 30, this.vertical_padding, 30);
       main_div = d3el.append('div').attr('class', 'main_div');
       main_svg = this.create_svg(main_div, this.width, this.height, this.vertical_padding, 0);
       bottom_svg = this.create_svg(d3el, this.width, 30, this.vertical_padding, 0);
-      layered_data = ["Low activity", "Med activity", "High activity"].map(function(keyword) {
+      relevant_y_keys = Object.keys(data[0]).filter(function(key) {
+        return key !== "xkey";
+      });
+      layered_data = relevant_y_keys.map(function(keyword) {
         return data.map(function(entry) {
           return {
-            x: entry.key,
+            x: entry.xkey,
             y: entry[keyword],
             name: keyword
           };
@@ -125,7 +128,7 @@
     data = [];
     for (i = j = 0; j < 30; i = ++j) {
       data.push({
-        key: "Access group " + (i + 1),
+        xkey: "Access group " + (i + 1),
         "Low activity": Math.random() * 10 + 20,
         "Med activity": Math.random() * 50 + 50,
         "High activity": Math.random() * 50 + 20
