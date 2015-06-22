@@ -15,7 +15,7 @@
     Chart.prototype.render = function(el, data) {
       var bottom_svg, colorscale, d3el, layered_data, main_div, main_svg, relevant_y_keys, rounded_xmax, top_svg, x, xmax, y;
       d3el = d3.select(el);
-      top_svg = this.create_svg(d3el, this.width, 30, this.vertical_padding, 30);
+      top_svg = this.create_svg(d3el, this.width, 60, this.vertical_padding, 0);
       main_div = d3el.append('div').attr('class', 'main_div');
       main_svg = this.create_svg(main_div, this.width, this.height, this.vertical_padding, 0);
       bottom_svg = this.create_svg(d3el, this.width, 30, this.vertical_padding, 0);
@@ -41,30 +41,37 @@
         return idx;
       }));
       colorscale = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"]);
-      this.draw_bottom_axis(bottom_svg, x.copy().domain([0, 100]));
       this.draw_legend(top_svg, layered_data, colorscale);
       this.draw_top_axis(top_svg, x);
       this.draw_left_axis(main_svg, y, layered_data[0]);
+      this.draw_bottom_axis(bottom_svg, x.copy().domain([0, 100]));
       this.draw_horizontal_lines(main_svg, x);
       return this.draw_bars(main_svg, layered_data, x, y, colorscale);
     };
 
     Chart.prototype.create_svg = function(el, width, height, vpadding, hpadding) {
+      if (vpadding == null) {
+        vpadding = 0;
+      }
+      if (hpadding == null) {
+        hpadding = 0;
+      }
       return el.append('svg').style('width', width + vpadding * 2).style('height', height + hpadding * 2).append('g').attr('transform', "translate( " + vpadding + ", " + hpadding + " )");
     };
 
     Chart.prototype.draw_top_axis = function(svg, x) {
-      var top_axis;
+      var svg_height, top_axis;
+      svg_height = parseInt(d3.select(svg.node().parentNode).style("height"));
       top_axis = svg.selectAll('.top_axis').data(x.ticks(10)).enter().append('text').attr('class', 'top_axis').attr('transform', function(d) {
-        return "translate(" + (x(d)) + ", 30)";
+        return "translate(" + (x(d)) + ", " + svg_height + ")";
       }).attr("dx", "-.5em").attr("dy", "-.5em").text(function(d) {
         return d;
       });
-      return svg.append('text').attr('transform', "translate(" + this.width + ", 0)").text('# of members').style('font-weight', 'bold');
+      return svg.append('text').attr('transform', "translate(" + this.width + ", " + 20. + ")").text('# of members').style('font-weight', 'bold');
     };
 
     Chart.prototype.draw_bottom_axis = function(svg, x) {
-      return svg.selectAll('.bottom_axis').data(x.ticks(10)).enter().append('text').attr('transform', function(d) {
+      return svg.selectAll('.bottom_axis').data(x.ticks(10)).enter().append('text').attr('class', 'bottom_axis').attr('transform', function(d) {
         return "translate(" + (x(d)) + ", 20)";
       }).attr("dx", "-.5em").attr("dy", "-.5em").text(function(d) {
         return d + "%";
@@ -87,7 +94,7 @@
       var legends, rect_side;
       rect_side = 20;
       legends = svg.selectAll('.legend').data(data).enter().append('g').attr('class', 'legend').attr('transform', function(d, idx) {
-        return "translate(" + (idx * rect_side * 6) + ", " + (-20) + ")";
+        return "translate(" + (idx * rect_side * 6) + ", 0)";
       });
       legends.append('rect').attr('x', 0).attr('y', 0).attr('width', rect_side).attr('height', rect_side).style('fill', function(d, i) {
         return colorscale(i);
@@ -97,10 +104,10 @@
       }).attr('x', rect_side + 2).attr('y', rect_side - 5);
     };
 
-    Chart.prototype.draw_bars = function(svg, data, x, y, color) {
+    Chart.prototype.draw_bars = function(svg, data, x, y, colorscale) {
       var g_groups, rect;
       g_groups = svg.selectAll('.g_groups').data(data).enter().append('g').attr('class', 'g_groups').style('fill', function(d, i) {
-        return color(i);
+        return colorscale(i);
       });
       return rect = g_groups.selectAll('rect').data(function(d) {
         return d;
