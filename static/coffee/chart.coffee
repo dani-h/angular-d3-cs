@@ -10,15 +10,12 @@ class Chart
     # Note that the chart consists of two independent `svg` components. One that contains most of the chart (bars, top
     # axis, left axis) and another one which contains the bottom axis. The main svg is wrapped in a div and is made
     # scrollable. The bottom axis is positioned below that div and is visible at all times.
-    main_div = d3.select(el)
-      .append('div')
-      .attr('class', 'main_div')
 
-    svg = main_div.append('svg')
-      .style('width', @width + @vertical_padding * 2)
-      .style('height', @height + @horizontal_padding * 2)
-      .append('g')
-        .attr('transform', "translate( #{@vertical_padding}, #{@horizontal_padding} )")
+    d3el = d3.select(el)
+    top_svg = @create_svg(d3el, @width, 30, @vertical_padding, 30)
+    main_div = d3el.append('div').attr('class', 'main_div')
+    main_svg = @create_svg(main_div, @width, @height, @vertical_padding, 0)
+    bottom_svg = @create_svg(d3el, @width, 30, @vertical_padding, 0)
 
     layered_data = ["Low activity", "Med activity", "High activity"].map((keyword) ->
       data.map((entry) ->
@@ -42,32 +39,33 @@ class Chart
 
     colorscale = d3.scale.ordinal().range(["#B7D5E2", "#29ABE2", "#196687"])
 
-    # Bottom axis is detached from the svg chart as the svg chart is scrollable while the
-    # bottom axis is always visible
-    @draw_bottom_axis(el, x.copy().domain([0, 100]))
-    @draw_top_axis(svg, x)
-    @draw_left_axis(svg, y, layered_data[0])
-    @draw_legend(svg, layered_data, colorscale)
-    @draw_bars(svg, layered_data, x, y, colorscale)
+    # Bottom and top axis are detached from the svg chart as the svg chart is scrollable
+    @draw_bottom_axis(bottom_svg, x.copy().domain([0, 100]))
+    @draw_legend(top_svg, layered_data, colorscale)
+    @draw_top_axis(top_svg, x)
+    @draw_left_axis(main_svg, y, layered_data[0])
+    @draw_horizontal_lines(main_svg, x)
+    @draw_bars(main_svg, layered_data, x, y, colorscale)
 
 
-  draw_top_axis: (svg, x, ticks) ->
+  create_svg: (el, width, height, vpadding, hpadding) ->
+    el.append('svg')
+      .style('width', width + vpadding * 2)
+      .style('height', height + hpadding * 2)
+      .append('g')
+        .attr('transform', "translate( #{vpadding}, #{hpadding} )")
+
+
+  draw_top_axis: (svg, x) ->
     # Top axis
     # --------------------------------------
     # Draw the axis first as I'm not sure if there is an alternative to `render-order`
     # that is supported by the major browsers
     top_axis = svg.selectAll('.top_axis')
       .data(x.ticks(10))
-      .enter().append('g')
+      .enter().append('text')
       .attr('class', 'top_axis')
-      .attr('transform', (d) -> "translate(#{x(d)}, 0)")
-
-    # Horizontal lines that go through the chart
-    top_axis.append('line')
-      .attr('y2', @height)
-      .style('stroke', 'gray')
-
-    top_axis.append('text')
+      .attr('transform', (d) -> "translate(#{x(d)}, 30)")
       .attr("dx", "-.5em")
       .attr("dy", "-.5em")
       .text((d) -> d)
@@ -79,7 +77,7 @@ class Chart
       .style('font-weight', 'bold')
 
 
-  draw_bottom_axis: (el, x) ->
+  draw_bottom_axis: (svg, x) ->
     # Draws the bottom axis
     # @Todo: Fix comment below when I get some sleep.
     # There are a couple of gotchas here. First, the percentage axis will use the 0, 100 for the domain while the top
@@ -87,17 +85,12 @@ class Chart
     # are made based on the random data from the top axis and will therefore not overlap with the bottom axis because of
     # the different domain. This is a question of how you want to visualize the data, but I'll leave it for now since it
     # looks ok.
-    bottom_axis_area = d3.select(el).append('svg')
-      .style('width', @width + @vertical_padding * 2)
-      .style('height', 30)
-      .style('margin', '0 auto')
-      .append('g')
-        .attr('transform', "translate( #{@vertical_padding}, 0)")
-
-    bottom_axis_area.selectAll('.bottom_axis')
+    svg.selectAll('.bottom_axis')
       .data(x.ticks(10))
       .enter().append('text')
       .attr('transform', (d) -> "translate(#{x(d)}, 20)")
+      .attr("dx", "-.5em")
+      .attr("dy", "-.5em")
       .text((d) -> d + "%")
 
 
@@ -121,7 +114,7 @@ class Chart
       .data(data)
       .enter().append('g')
       .attr('class', 'legend')
-      .attr('transform', (d, idx) => "translate(#{idx * rect_side * 5}, #{-@horizontal_padding + 10})")
+      .attr('transform', (d, idx) -> "translate(#{idx * rect_side * 6}, #{-20})")
 
     legends.append('rect')
       .attr('x', 0)
@@ -157,6 +150,17 @@ class Chart
       .attr('y', (d, idx) -> y(idx))
       .attr('width', (d) -> x(d.y))
       .attr('height', y.rangeBand())
+
+
+  draw_horizontal_lines: (svg, x) ->
+    # Horizontal lines that go through the chart
+    svg.selectAll('.horizontal_line')
+      .data(x.ticks(10))
+      .enter().append('line')
+      .attr('transform', (d) -> "translate(#{x(d)}, 0)")
+      .attr('y2', @height)
+      .attr('class', 'horizontal_line')
+      .style('stroke', 'gray')
 
 
 generate_data = () ->
