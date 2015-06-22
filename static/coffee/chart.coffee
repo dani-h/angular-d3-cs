@@ -72,7 +72,7 @@ class Chart
 
     # Standalone top right text `# of members`
     svg.append('text')
-      .attr('transform', "translate(#{@width}, -20)")
+      .attr('transform', "translate(#{@width}, 0)")
       .text('# of members')
       .style('font-weight', 'bold')
 

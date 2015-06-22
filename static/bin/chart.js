@@ -57,7 +57,7 @@
       }).attr("dx", "-.5em").attr("dy", "-.5em").text(function(d) {
         return d;
       });
-      return svg.append('text').attr('transform', "translate(" + this.width + ", -20)").text('# of members').style('font-weight', 'bold');
+      return svg.append('text').attr('transform', "translate(" + this.width + ", 0)").text('# of members').style('font-weight', 'bold');
     };
 
     Chart.prototype.draw_bottom_axis = function(svg, x) {
