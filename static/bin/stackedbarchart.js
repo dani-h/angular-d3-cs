@@ -15,6 +15,7 @@
     StackedBarChart.prototype.render = function(el, data) {
       var bottom_svg, colorscale, d3el, layered_data, main_div, main_svg, relevant_y_keys, rounded_xmax, top_svg, x, xmax, y;
       d3el = d3.select(el);
+      d3el.selectAll("*").remove();
       top_svg = this.create_svg(d3el, this.width, 60, this.vertical_padding, 0);
       main_div = d3el.append("div").attr("class", "main_div");
       main_svg = this.create_svg(main_div, this.width, this.height, this.vertical_padding, 0);

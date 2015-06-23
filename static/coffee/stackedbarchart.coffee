@@ -18,6 +18,8 @@ class StackedBarChart
   # @param {Array<{xkey: string, ykeys...: string}>} Data
   render: (el, data) ->
     d3el = d3.select(el)
+    d3el.selectAll("*").remove()
+
     top_svg = @create_svg(d3el, @width, 60, @vertical_padding, 0)
     main_div = d3el.append("div").attr("class", "main_div")
     main_svg = @create_svg(main_div, @width, @height, @vertical_padding, 0)

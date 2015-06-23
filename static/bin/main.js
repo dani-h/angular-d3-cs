@@ -5,16 +5,23 @@
   appModule = angular.module("app", []);
 
   appModule.controller("ChartController", [
-    "$scope", function($scope) {
-      return $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
+    "$scope", "$interval", function($scope, $interval) {
+      $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
+      return $interval(function() {
+        return $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
+      }, 1000);
     }
   ]);
 
   appModule.directive("stackedBarChart", function() {
     return {
       restrict: "E",
-      link: function(scope, el, attrs) {
-        return new window.StackedBarChart().render(el[0], scope.stacked_barchart_data);
+      link: function($scope, el, attrs) {
+        var chart;
+        chart = new window.StackedBarChart();
+        return $scope.$watch("stacked_barchart_data", function() {
+          return chart.render(el[0], $scope.stacked_barchart_data);
+        });
       }
     };
   });
