@@ -137,9 +137,9 @@
     for (i = j = 0; j < 30; i = ++j) {
       data.push({
         xkey: "Access group " + (i + 1),
-        "Low activity": Math.random() * 10 + 20,
-        "Med activity": Math.random() * 50 + 50,
-        "High activity": Math.random() * 50 + 20
+        "Low activity": Math.random() * 400 + 200,
+        "Med activity": Math.random() * 300 + 100,
+        "High activity": Math.random() * 200 + 50
       });
     }
     return data;
