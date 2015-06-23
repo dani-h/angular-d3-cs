@@ -1,4 +1,4 @@
-class Chart
+class StackedBarChart
   constructor: ->
     @vertical_padding = 100
     @horizontal_padding =  60
@@ -12,14 +12,14 @@ class Chart
   # The others are always visible. The chart is attached to the passed parameter el.
   #
   # We expect that the data contains a json array where each object has an `xkey` and all the other keys describe the
-  # different y layers. See `generate_data()`. Example [{xkey: 'foo', y1: 'baz', y2: 'bar'},...]
+  # different y layers. See `generate_data()`. Example [{xkey: "foo", y1: "baz", y2: "bar"},...]
   #
   # @param {jqlite object} Object passed from angulars link function
   # @param {Array<{xkey: string, ykeys...: string}>} Data
   render: (el, data) ->
     d3el = d3.select(el)
     top_svg = @create_svg(d3el, @width, 60, @vertical_padding, 0)
-    main_div = d3el.append('div').attr('class', 'main_div')
+    main_div = d3el.append("div").attr("class", "main_div")
     main_svg = @create_svg(main_div, @width, @height, @vertical_padding, 0)
     bottom_svg = @create_svg(d3el, @width, 30, @vertical_padding, 0)
 
@@ -66,11 +66,11 @@ class Chart
   #
   # @returns {d3el}
   create_svg: (el, width, height, vpadding=0, hpadding=0) ->
-    el.append('svg')
-      .style('width', width + vpadding * 2)
-      .style('height', height + hpadding * 2)
-      .append('g')
-        .attr('transform', "translate( #{vpadding}, #{hpadding} )")
+    el.append("svg")
+      .style("width", width + vpadding * 2)
+      .style("height", height + hpadding * 2)
+      .append("g")
+        .attr("transform", "translate( #{vpadding}, #{hpadding} )")
 
   # Draws the top axis
   # @param {d3el} svg
@@ -78,33 +78,33 @@ class Chart
   draw_top_axis: (svg, x) ->
     svg_height = parseInt(d3.select(svg.node().parentNode).style("height"))
 
-    top_axis = svg.selectAll('.top_axis')
+    top_axis = svg.selectAll(".top_axis")
       .data(x.ticks(10))
-      .enter().append('text')
-      .attr('class', 'top_axis')
-      .attr('transform', (d) -> "translate(#{x(d)}, #{svg_height})")
+      .enter().append("text")
+      .attr("class", "top_axis")
+      .attr("transform", (d) -> "translate(#{x(d)}, #{svg_height})")
       .attr("dx", "-.5em")
       .attr("dy", "-.5em")
       .text((d) -> d)
 
     # Standalone top right text `# of members`
-    svg.append('text')
-      .attr('transform', "translate(#{@width}, #{20})")
-      .text('# of members')
-      .style('font-weight', 'bold')
+    svg.append("text")
+      .attr("transform", "translate(#{@width}, #{20})")
+      .text("# of members")
+      .style("font-weight", "bold")
 
 
   # Draws the bottom axis. The dx and dy attributes of the ticks should be the same for the top and bottom axis.
   # @param {d3el} svg
   # @param {d3.scale.linear} x
   draw_bottom_axis: (svg, x) ->
-    # Note: I have to hardcode 20 into the y translation here otherwise it's positioned outside the parent svg.
-    # Why? I need to figure out...For other svg elements that are not text this doesn't happen
-    svg.selectAll('.bottom_axis')
+    # Note: I have to hardcode 20 into the y translation here otherwise it"s positioned outside the parent svg.
+    # Why? I need to figure out...For other svg elements that are not text this doesn"t happen
+    svg.selectAll(".bottom_axis")
       .data(x.ticks(10))
-      .enter().append('text')
-      .attr('class', 'bottom_axis')
-      .attr('transform', (d) -> "translate(#{x(d)}, 20)")
+      .enter().append("text")
+      .attr("class", "bottom_axis")
+      .attr("transform", (d) -> "translate(#{x(d)}, 20)")
       .attr("dx", "-.5em")
       .attr("dy", "-.5em")
       .text((d) -> d + "%")
@@ -115,36 +115,36 @@ class Chart
   # @param {d3.scale.ordinal} y
   # @param {Array{xkey: string, y: number, y0: number}} data
   draw_left_axis: (svg, y, data) =>
-    left_axis = svg.selectAll('.left_axis')
+    left_axis = svg.selectAll(".left_axis")
       .data(data)
-      .enter().append('g')
-      .attr('class', 'left_axis')
-      .attr('transform', (d, idx) => "translate(#{-@vertical_padding + 5}, #{ y(idx) + 20 })")
+      .enter().append("g")
+      .attr("class", "left_axis")
+      .attr("transform", (d, idx) => "translate(#{-@vertical_padding + 5}, #{ y(idx) + 20 })")
 
-    left_axis.append('text')
+    left_axis.append("text")
       .text((d) -> d.x)
 
 
   draw_legend: (svg, data, colorscale) ->
     rect_side = 20
 
-    legends = svg.selectAll('.legend')
+    legends = svg.selectAll(".legend")
       .data(data)
-      .enter().append('g')
-      .attr('class', 'legend')
-      .attr('transform', (d, idx) -> "translate(#{idx * rect_side * 6}, 0)")
+      .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", (d, idx) -> "translate(#{idx * rect_side * 6}, 0)")
 
-    legends.append('rect')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', rect_side)
-      .attr('height', rect_side)
-      .style('fill', (d, i) -> colorscale(i))
+    legends.append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", rect_side)
+      .attr("height", rect_side)
+      .style("fill", (d, i) -> colorscale(i))
 
-    legends.append('text')
+    legends.append("text")
       .text((d) -> d[0].name)
-      .attr('x', rect_side + 2)
-      .attr('y', rect_side - 5)
+      .attr("x", rect_side + 2)
+      .attr("y", rect_side - 5)
 
 
   # Draws the stacked bars of the charts
@@ -155,34 +155,34 @@ class Chart
   # @param {d3.scale.ordinal} colorscale
   draw_bars: (svg, data, x, y, colorscale) ->
     # data = top level arrays
-    g_groups = svg.selectAll('.g_groups')
+    g_groups = svg.selectAll(".g_groups")
       .data(data)
-      .enter().append('g')
-      .attr('class', 'g_groups')
-      .style('fill', (d, i) -> colorscale(i))
+      .enter().append("g")
+      .attr("class", "g_groups")
+      .style("fill", (d, i) -> colorscale(i))
 
     # Magic happens here
     # Note that we access the objects inside the top level arrays arrays
-    rect = g_groups.selectAll('rect')
+    rect = g_groups.selectAll("rect")
       .data((d) -> d)
-      .enter().append('rect')
-      .attr('x', (d) -> x(d.y0))
-      .attr('y', (d, idx) -> y(idx))
-      .attr('width', (d) -> x(d.y))
-      .attr('height', y.rangeBand())
+      .enter().append("rect")
+      .attr("x", (d) -> x(d.y0))
+      .attr("y", (d, idx) -> y(idx))
+      .attr("width", (d) -> x(d.y))
+      .attr("height", y.rangeBand())
 
 
   # Draws the horizontal lines that go behind the bar chart
   # @param {d3el} svg
   # @param {d3.scale.linear} x
   draw_horizontal_lines: (svg, x) ->
-    svg.selectAll('.horizontal_line')
+    svg.selectAll(".horizontal_line")
       .data(x.ticks(10))
-      .enter().append('line')
-      .attr('transform', (d) -> "translate(#{x(d)}, 0)")
-      .attr('y2', @height)
-      .attr('class', 'horizontal_line')
-      .style('stroke', 'gray')
+      .enter().append("line")
+      .attr("transform", (d) -> "translate(#{x(d)}, 0)")
+      .attr("y2", @height)
+      .attr("class", "horizontal_line")
+      .style("stroke", "gray")
 
 
 
@@ -190,7 +190,7 @@ class Chart
 # `xkey` and at least one arbitrary y-key must be present. Any key not named xkey will be assumed to be a y-key.
 #
 # @returns Array{xkey: string, y-keys:number...}
-generate_data = () ->
+gen_stackedbarchart_data = () ->
   data = []
   for i in [0...30]
     data.push({
@@ -202,6 +202,6 @@ generate_data = () ->
   data
 
 
-window.Chart = Chart
-window.generate_data = generate_data
+window.StackedBarChart = StackedBarChart
+window.gen_stackedbarchart_data = gen_stackedbarchart_data
 

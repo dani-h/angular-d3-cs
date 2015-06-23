@@ -2,18 +2,19 @@
 (function() {
   var appModule;
 
-  appModule = angular.module('app', []);
+  appModule = angular.module("app", []);
 
-  appModule.controller('ChartController', [
-    '$scope', function($scope) {
-      return $scope.data = window.generate_data();
+  appModule.controller("ChartController", [
+    "$scope", function($scope) {
+      return $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
     }
   ]);
 
-  appModule.directive('chart', function() {
+  appModule.directive("stackedBarChart", function() {
     return {
+      restrict: "E",
       link: function(scope, el, attrs) {
-        return new window.Chart().render(el[0], scope.data);
+        return new window.StackedBarChart().render(el[0], scope.stacked_barchart_data);
       }
     };
   });

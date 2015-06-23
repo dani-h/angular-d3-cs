@@ -6,7 +6,7 @@
     <script src="lib/angular.js" defer></script>
     <script src="lib/d3.js" defer></script>
     <script src="bin/main.js" defer></script>
-    <script src="bin/chart.js" defer></script>
+    <script src="bin/stackedbarchart.js" defer></script>
 </head>
 
 <style type="text/css">
@@ -15,7 +15,7 @@
     box-sizing: border-box;
 }
 
-chart {
+stacked-bar-chart {
     display: block;
     margin: 40px auto;
     width: 1200px;
@@ -47,14 +47,13 @@ svg {
     fill: #444444;
 }
 
-
 </style>
 
 <body>
     <!--Raw to avoid jinja processing angular templates-->
     {% raw %}
     <div ng-controller="ChartController">
-        <chart id="svg-container"></chart>
+        <stacked-bar-chart></stacked-bar-chart>
     </div>
     {% endraw %}
 </body>
