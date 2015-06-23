@@ -6,10 +6,21 @@
 
   appModule.controller("ChartController", [
     "$scope", "$interval", function($scope, $interval) {
+      $scope.interval_running = false;
       $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
-      return $interval(function() {
-        return $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
-      }, 1000);
+      $scope.start_update = function() {
+        if ($scope.interval_running === false) {
+          return $scope.interval_running = $interval(function() {
+            return $scope.stacked_barchart_data = window.gen_stackedbarchart_data();
+          }, 750);
+        }
+      };
+      return $scope.stop_update = function() {
+        if ($scope.interval_running != null) {
+          $interval.cancel($scope.interval_running);
+          return $scope.interval_running = false;
+        }
+      };
     }
   ]);
 

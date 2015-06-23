@@ -15,6 +15,10 @@
     box-sizing: border-box;
 }
 
+#content {
+    text-align: center;
+}
+
 stacked-bar-chart {
     display: block;
     margin: 40px auto;
@@ -52,9 +56,13 @@ svg {
 <body>
     <!--Raw to avoid jinja processing angular templates-->
     {% raw %}
-    <div ng-controller="ChartController">
+
+    <div id="content" ng-controller="ChartController">
+        <button class="update-btns" ng-click="start_update()">Start updating</button>
+        <button class="update-btns" ng-click="stop_update()">Stop updating</button>
         <stacked-bar-chart></stacked-bar-chart>
     </div>
+
     {% endraw %}
 </body>
 

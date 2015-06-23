@@ -1,10 +1,19 @@
 appModule = angular.module("app", [])
 
 appModule.controller("ChartController", ["$scope", "$interval", ($scope, $interval) ->
+  $scope.interval_running = false
   $scope.stacked_barchart_data = window.gen_stackedbarchart_data()
-  $interval(
-    -> $scope.stacked_barchart_data = window.gen_stackedbarchart_data()
-    1000)
+
+  $scope.start_update = ->
+    if $scope.interval_running == false
+      $scope.interval_running = $interval(
+        -> $scope.stacked_barchart_data = window.gen_stackedbarchart_data()
+        750)
+
+  $scope.stop_update = ->
+    if $scope.interval_running?
+      $interval.cancel($scope.interval_running)
+      $scope.interval_running = false
 ])
 
 appModule.directive("stackedBarChart", -> {
