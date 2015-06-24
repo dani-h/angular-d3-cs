@@ -69,8 +69,8 @@ class StackedBarChart
   # @returns {d3el}
   create_svg: (el, width, height, vpadding=0, hpadding=0) ->
     el.append("svg")
-      .style("width", width + vpadding * 2)
-      .style("height", height + hpadding * 2)
+      .style("width", width + vpadding * 2 + "px")
+      .style("height", height + hpadding * 2 + "px")
       .append("g")
         .attr("transform", "translate( #{vpadding}, #{hpadding} )")
 

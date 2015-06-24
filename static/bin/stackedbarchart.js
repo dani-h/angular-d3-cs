@@ -57,7 +57,7 @@
       if (hpadding == null) {
         hpadding = 0;
       }
-      return el.append("svg").style("width", width + vpadding * 2).style("height", height + hpadding * 2).append("g").attr("transform", "translate( " + vpadding + ", " + hpadding + " )");
+      return el.append("svg").style("width", width + vpadding * 2 + "px").style("height", height + hpadding * 2 + "px").append("g").attr("transform", "translate( " + vpadding + ", " + hpadding + " )");
     };
 
     StackedBarChart.prototype.draw_top_axis = function(svg, x) {
